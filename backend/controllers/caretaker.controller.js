@@ -84,3 +84,17 @@ export async function updateCaretakerProfile(req, res) {
     res.status(500).json({ error: err.message })
   }
 }
+export async function getCaretakerBookedDates(req, res) {
+  try {
+    const bookings = await prisma.booking.findMany({
+      where: {
+        caretakerId: parseInt(req.params.id),
+        status: { in: ['PENDING', 'CONFIRMED'] },
+      },
+      select: { startDate: true, endDate: true },
+    })
+    res.json(bookings)
+  } catch (err) {
+    res.status(500).json({ error: err.message })
+  }
+}
