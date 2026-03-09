@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  caretaker  Caretaker?
+  careSeeker CareSeeker?
+}
+
+model Caretaker {
+  id                 Int       @id @default(autoincrement())
+  userId             Int       @unique
+  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio                String?
+  hourlyRate         Float     @default(0)
+  availability       String    @default("flexible")
+  verificationStatus String    @default("PENDING")
+  status             String     @default("PENDING")
+  documents          String?   // JSON array of file paths
+  certifications     String?   // JSON array of cert paths
+  verifiedAt         DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  bookings Booking[]
+  reviews  Review[]
+}
+
+model CareSeeker {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  address   String?
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings Booking[]
+  reviews  Review[]
+}
+
+model Booking {
+  id           Int        @id @default(autoincrement())
+  caretakerId  Int
+  careSeekerId Int
+  caretaker    Caretaker  @relation(fields: [caretakerId], references: [id])
+  careSeeker   CareSeeker @relation(fields: [careSeekerId], references: [id])
+  startDate    DateTime
+  endDate      DateTime
+  status       String     @default("PENDING")  // PENDING | CONFIRMED | COMPLETED | CANCELLED
+  totalCost    Float?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  review Review?
+}
+
+model Review {
+  id           Int        @id @default(autoincrement())
+  bookingId    Int        @unique
+  booking      Booking    @relation(fields: [bookingId], references: [id])
+  caretakerId  Int
+  careSeekerId Int
+  caretaker    Caretaker  @relation(fields: [caretakerId], references: [id])
+  careSeeker   CareSeeker @relation(fields: [careSeekerId], references: [id])
+  rating       Int
+  comment      String?
+  createdAt    DateTime   @default(now())
+}
