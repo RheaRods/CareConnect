@@ -11,7 +11,7 @@ import CaretakerProfilePage from "./pages/caretaker/CaretakerProfilePage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 
 // Guard: only lets the given role through, redirects otherwise
-const RoleRoute = ({ role, children }: { role: string; children: JSX.Element }) => {
+const RoleRoute = ({ role, children }: { role: string; children: React.ReactElement }) => {
   const token    = localStorage.getItem("token");
   const userRole = localStorage.getItem("userRole");
   if (!token)           return <Navigate to="/login" replace />;
